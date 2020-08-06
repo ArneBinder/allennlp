@@ -1,5 +1,5 @@
 import math
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any
 
 from overrides import overrides
 
@@ -51,7 +51,8 @@ class PretrainedTransformerEmbedder(TokenEmbedder):
         train_parameters: bool = True,
         last_layer_only: bool = True,
         override_weights_file: Optional[str] = None,
-        override_weights_strip_prefix: Optional[str] = None
+        override_weights_strip_prefix: Optional[str] = None,
+        update_config: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__()
         from allennlp.common import cached_transformers
@@ -59,6 +60,8 @@ class PretrainedTransformerEmbedder(TokenEmbedder):
         self.transformer_model = cached_transformers.get(
             model_name, True, override_weights_file, override_weights_strip_prefix
         )
+        if update_config is not None:
+            self.transformer_model.config.update(update_config)
         self.config = self.transformer_model.config
         if sub_module:
             assert hasattr(self.transformer_model, sub_module)
